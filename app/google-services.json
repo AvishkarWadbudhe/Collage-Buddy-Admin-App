@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "663786256715",
+    "firebase_url": "https://collage-buddy-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "collage-buddy",
+    "storage_bucket": "collage-buddy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663786256715:android:bee16b78c79cf1524e10ce",
+        "android_client_info": {
+          "package_name": "com.example.collagebuddyadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "663786256715-fg55o38iihke3d3cr17iiqjb2npj921g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEKxRKqZOJgzZLASl_3BllXkp4uogu5dA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "663786256715-fg55o38iihke3d3cr17iiqjb2npj921g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
