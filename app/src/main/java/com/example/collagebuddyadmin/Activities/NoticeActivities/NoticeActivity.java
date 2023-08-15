@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class NoticeActivity extends AppCompatActivity implements OnNoticeClickListener {
 
@@ -226,25 +227,29 @@ public class NoticeActivity extends AppCompatActivity implements OnNoticeClickLi
         String imageUrl = notice.getImage(); // Assuming there's a method to get the image URL
 
         // Delete image from Firebase Storage
-        StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
-        storageReference.delete()
-                .addOnSuccessListener(aVoid -> {
-                    // Image deletion successful, now delete from the Firebase database
-                    databaseReference.child(uniqueKey).removeValue()
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    showToast("Notice Deleted");
-                                    fetchDataFromFirebase();
-                                } else {
-                                    showToast("Oops! Something went wrong");
-                                }
-                            })
-                            .addOnFailureListener(e -> {
-                                showToast("Error: " + e.getMessage());
-                            });
+        if(!Objects.equals(imageUrl, ""))
+        {
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
+            storageReference.delete()
+                    .addOnSuccessListener(aVoid -> {
+                        // Image deletion successful, now delete from the Firebase database
+                    })
+                    .addOnFailureListener(exception -> {
+                        showToast("Image deletion failed: " + exception.getMessage());
+                    });
+        }
+
+        databaseReference.child(uniqueKey).removeValue()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        showToast("Notice Deleted");
+                        fetchDataFromFirebase();
+                    } else {
+                        showToast("Oops! Something went wrong");
+                    }
                 })
-                .addOnFailureListener(exception -> {
-                    showToast("Image deletion failed: " + exception.getMessage());
+                .addOnFailureListener(e -> {
+                    showToast("Error: " + e.getMessage());
                 });
     }
 
