@@ -1,12 +1,5 @@
 <resources>
     <string name="app_name">CollageBuddyAdmin</string>
-
-    <string-array name="notice_types_array">
-        <item>Select Class</item>
-        <item>BCA</item>
-        <item>MSCCS</item>
-        <item>DCA</item>
-        <item>PGDCA</item>
-    </string-array>
+    <string name="no_file_selected">No file Selected</string>
 
 </resources>

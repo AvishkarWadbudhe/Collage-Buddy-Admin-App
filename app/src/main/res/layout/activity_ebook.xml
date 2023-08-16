@@ -63,25 +63,36 @@
                         android:layout_marginTop="15dp"
                         android:padding="15dp" />
 
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="2dp"
                         android:background="@color/light_grey" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/selectbookBtn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
-                        android:backgroundTint="@color/green"
-                        android:text="Select PDF"
-                        android:textStyle="bold" />
-
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/bookFileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_file_selected"
+                android:textStyle="italic"
+                android:layout_gravity="center"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/selectbookBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/green"
+                android:text="Select PDF"
+                android:textStyle="bold" />
+
+
 
             <!-- Notice Title TextInputLayout -->
             <com.google.android.material.textfield.TextInputLayout
@@ -93,21 +104,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-
-
                     android:hint="Book Title" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Spinner
-                android:id="@+id/selectClasses"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:gravity="center"
-                android:padding="16dp"
-                android:background="@drawable/spinner_background"
-                android:spinnerMode="dialog" />
 
             <!-- Upload Notice Button -->
             <com.google.android.material.button.MaterialButton
