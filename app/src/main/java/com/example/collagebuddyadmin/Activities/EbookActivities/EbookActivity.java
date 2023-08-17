@@ -15,10 +15,14 @@ import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.example.collagebuddyadmin.Activities.NoticeActivities.NoticeActivity;
+import com.example.collagebuddyadmin.Adapters.EbookAdapter;
 import com.example.collagebuddyadmin.Adapters.NoticeAdapter;
+import com.example.collagebuddyadmin.Models.EbookDataModel;
 import com.example.collagebuddyadmin.Models.NoticeDataModel;
 import com.example.collagebuddyadmin.R;
 import com.example.collagebuddyadmin.databinding.ActivityEbookBinding;
@@ -27,14 +31,19 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -45,12 +54,17 @@ public class EbookActivity extends AppCompatActivity {
 
     private final int ReqCode = 1;
     private Uri pdfData;
+
     private DatabaseReference databaseReference;
     private String eBookName;
     private StorageReference storageReference;
 
     private ProgressDialog progressDialog;
+    private List<NoticeDataModel> eBookList;
     private Calendar calendar;
+    private Bitmap thumbnail;
+    private String thumbnailUrl ="";
+    private EbookAdapter ebookAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +91,73 @@ public class EbookActivity extends AppCompatActivity {
                    showToast("Please Upload PDF");
                }
                else {
-                   uploadPdf();
+                   Upload_Ebook_Thumbnail();
                }
 
            });
     }
+
+    private void fetchDataFromFirebase() {
+        // Attach a ValueEventListener to the database reference
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                eBookList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    NoticeDataModel notice = dataSnapshot.getValue(NoticeDataModel.class);
+                    eBookList.add(notice);
+                }
+                if (eBookList.isEmpty()) {
+                    binding.noNotice.setVisibility(View.VISIBLE);
+                    binding.prevNotice.setVisibility(View.GONE);
+                } else {
+                    binding.noNotice.setVisibility(View.GONE);
+                    binding.prevNotice.setVisibility(View.VISIBLE);
+                }
+                // Notify the adapter of data change
+             //   ebookAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle errors if any
+                showToast("Failed to fetch data");
+            }
+        });
+    }
+
+    private void Upload_Ebook_Thumbnail() {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        thumbnail.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        byte[] finalImg = byteArrayOutputStream.toByteArray();
+        final StorageReference filePath = storageReference.child("Ebook_Thumbnails").child(System.currentTimeMillis() + ".jpg");
+
+        final UploadTask uploadTask = filePath.putBytes(finalImg);
+        uploadTask.addOnCompleteListener(EbookActivity.this, new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    thumbnailUrl = String.valueOf(uri);
+                                    uploadPdf();
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    progressDialog.dismiss();
+                    showToast("Oops! Something went wrong");
+                }
+            }
+        });
+    }
+
 
     private void uploadPdf() {
         progressDialog.setTitle("Please wait...");
@@ -123,14 +199,21 @@ public class EbookActivity extends AppCompatActivity {
         });
     }
     private void uploadData(String pdfUrl) {
-        showToast("heheheheh");
         DatabaseReference eBookReference = databaseReference;
         final String uniqueKey = eBookReference.push().getKey();
+        SimpleDateFormat currentDate = new SimpleDateFormat("dd-MM-yy hh:mm a");
+        String date = currentDate.format(calendar.getTime());
+
+        EbookDataModel ebookDataModel = new EbookDataModel(
+                binding.bookTitle.getText().toString(),thumbnailUrl,date,pdfUrl
+        );
+
         HashMap data = new HashMap();
         data.put("pdfTitle",binding.bookTitle.getText().toString());
         data.put("pdfUrl",pdfUrl);
+        data.put("thumbnailUrl",thumbnailUrl);
 
-                eBookReference.child(uniqueKey).setValue(data).addOnCompleteListener(new OnCompleteListener<Void>() {
+                eBookReference.child(uniqueKey).setValue(ebookDataModel).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 progressDialog.dismiss();
@@ -164,7 +247,7 @@ public class EbookActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ReqCode && resultCode == RESULT_OK) {
          pdfData =data.getData();
-            Bitmap thumbnail = generatePdfThumbnail(pdfData);
+            thumbnail = generatePdfThumbnail(pdfData);
             if (thumbnail != null) {
                 binding.prevImage.setImageBitmap(thumbnail);
             } else {
@@ -188,6 +271,7 @@ public class EbookActivity extends AppCompatActivity {
             binding.bookFileName.setText(eBookName.toString());
         }
     }
+
     private Bitmap generatePdfThumbnail(Uri pdfUri) {
         try {
             ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(pdfUri, "r");

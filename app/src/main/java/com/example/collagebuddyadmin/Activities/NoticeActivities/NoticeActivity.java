@@ -29,6 +29,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -86,18 +88,23 @@ public class NoticeActivity extends AppCompatActivity implements OnNoticeClickLi
             }
         });
     }
-
     private void fetchDataFromFirebase() {
-        // Attach a ValueEventListener to the database reference
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        // Create a query to retrieve data in descending order of timestamps
+        Query query = databaseReference.orderByChild("time");
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    noticeList.clear();
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        NoticeDataModel notice = dataSnapshot.getValue(NoticeDataModel.class);
-                        noticeList.add(notice);
-                    }
+                noticeList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    NoticeDataModel notice = dataSnapshot.getValue(NoticeDataModel.class);
+
+                    noticeList.add(notice);
+                }
+                // Reverse the list to display the latest items first
+                Collections.reverse(noticeList);
+
                 if (noticeList.isEmpty()) {
                     binding.noNotice.setVisibility(View.VISIBLE);
                     binding.prevNotice.setVisibility(View.GONE);
@@ -105,17 +112,19 @@ public class NoticeActivity extends AppCompatActivity implements OnNoticeClickLi
                     binding.noNotice.setVisibility(View.GONE);
                     binding.prevNotice.setVisibility(View.VISIBLE);
                 }
-                    // Notify the adapter of data change
-                    noticeAdapter.notifyDataSetChanged();
+
+                // Notify the adapter of data change
+                noticeAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Handle errors if any
-                showToast("Failed to fetch data");
+                // Handle the error if needed
             }
         });
     }
+
+
 
     private void UploadDataWithImage(String imageUrl) {
         progressDialog.setMessage("Uploading");

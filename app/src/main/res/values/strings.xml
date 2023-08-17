@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">CollageBuddyAdmin</string>
     <string name="no_file_selected">No file Selected</string>
+    <string name="book_title">Book Title</string>
+    <string name="upload_e_book">Upload E-Book</string>
 
 </resources>
