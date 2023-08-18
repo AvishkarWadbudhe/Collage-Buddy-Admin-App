@@ -6,6 +6,26 @@ public class EbookDataModel {
     private String ebookThumbnail;
     private String date;
 
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    private String key;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    private String time;
+
     public String getPdfUrl() {
         return pdfUrl;
     }
@@ -43,10 +63,12 @@ public class EbookDataModel {
     public EbookDataModel() {
     }
 
-    public EbookDataModel(String ebookTitle, String ebookThumbnail, String date,String pdfUrl) {
+    public EbookDataModel(String ebookTitle, String ebookThumbnail, String date,String pdfUrl,String time,String key) {
         this.ebookTitle = ebookTitle;
         this.ebookThumbnail = ebookThumbnail;
         this.date = date;
         this.pdfUrl=pdfUrl;
+        this.time =time;
+        this.key=key;
     }
 }

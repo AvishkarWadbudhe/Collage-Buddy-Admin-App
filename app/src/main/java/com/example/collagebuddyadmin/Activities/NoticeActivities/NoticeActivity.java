@@ -230,7 +230,7 @@ public class NoticeActivity extends AppCompatActivity implements OnNoticeClickLi
         builder.show();
     }
 
-    public void deleteNotice(int position) {
+    private void deleteNotice(int position) {
         NoticeDataModel notice = noticeList.get(position);
         String uniqueKey = notice.getKey();
         String imageUrl = notice.getImage(); // Assuming there's a method to get the image URL
