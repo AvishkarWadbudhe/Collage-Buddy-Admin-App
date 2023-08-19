@@ -1,4 +1,4 @@
-package com.example.collagebuddyadmin;
+package com.example.collagebuddyadmin.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,6 +29,10 @@ public class MainActivity extends AppCompatActivity {
         });
         binding.cardViewNotes.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, EbookActivity.class);
+            startActivity(intent);
+        });
+        binding.cardViewFacultyDetail.setOnClickListener(v -> {
+            Intent intent =new Intent(MainActivity.this, FacultyActivity.class);
             startActivity(intent);
         });
     }

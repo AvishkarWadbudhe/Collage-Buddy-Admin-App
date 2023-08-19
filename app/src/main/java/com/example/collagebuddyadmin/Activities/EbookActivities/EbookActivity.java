@@ -81,9 +81,7 @@ public class EbookActivity extends AppCompatActivity implements OnEbookClickList
         fetchDataFromFirebase();
 
 
-        binding.selectbookBtn.setOnClickListener(view -> {
-            openGallery();
-        });
+        binding.selectbookBtn.setOnClickListener(view -> openGallery());
 
         binding.uploadEbookBtn.setOnClickListener(v -> {
             if (binding.bookTitle.getText().toString().isEmpty()) {
@@ -131,6 +129,9 @@ public class EbookActivity extends AppCompatActivity implements OnEbookClickList
     }
 
     private void Upload_Ebook_Thumbnail() {
+        progressDialog.setTitle("Please wait...");
+        progressDialog.setMessage("Uploading E-Book...");
+        progressDialog.show();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
         byte[] finalImg = byteArrayOutputStream.toByteArray();
@@ -163,9 +164,7 @@ public class EbookActivity extends AppCompatActivity implements OnEbookClickList
 
 
     private void uploadPdf() {
-        progressDialog.setTitle("Please wait...");
-        progressDialog.setMessage("Uploading E-Book...");
-        progressDialog.show();
+
         StorageReference reference = storageReference.child("Ebooks/" + binding.bookTitle.getText().toString() + ".pdf");
 
         reference.putFile(pdfData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

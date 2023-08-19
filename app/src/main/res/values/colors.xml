@@ -6,6 +6,7 @@
 
     <color name="colorTextHintSubtile">#CECECECE</color>
     <color name="colorTextHint">#7B7B7B</color>
+    <color name="input_background">#ECECEC</color>
 
     <color name="colorPrimary">#8277bd</color>
     <color name="colorPrimaryDark">#884c8c</color>
