@@ -1,5 +1,5 @@
 package com.example.collagebuddyadmin.Listeners;
 
 public interface OnEbookClickListener {
-    void onDeleteNotice(int position);
+    void onDeleteEbook(int position);
 }

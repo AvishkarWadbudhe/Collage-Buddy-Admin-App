@@ -20,9 +20,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewFaculty"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/titleFaculty"
-        tools:listitem="@layout/faculty_container" />
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:layout_below="@id/titleFaculty"/>
 
     <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton

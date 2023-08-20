@@ -60,7 +60,7 @@ public class EbookAdapter extends RecyclerView.Adapter<EbookAdapter.EbookViewHol
 
         // Set an onClickListener to handle clicks on the items
         holder.itemView.setOnLongClickListener(v -> {
-           onEbookClickListener.onDeleteNotice(position);
+           onEbookClickListener.onDeleteEbook(position);
             return true;
         });
     }

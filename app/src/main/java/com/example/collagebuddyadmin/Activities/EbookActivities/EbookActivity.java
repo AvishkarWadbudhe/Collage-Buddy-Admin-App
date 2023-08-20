@@ -73,12 +73,12 @@ public class EbookActivity extends AppCompatActivity implements OnEbookClickList
         progressDialog = new ProgressDialog(this);
         databaseReference = FirebaseDatabase.getInstance().getReference("Ebooks");
         storageReference = FirebaseStorage.getInstance().getReference();
-
+        fetchDataFromFirebase();
         ebookAdapter = new EbookAdapter( eBookList, this,this);
 
         binding.recyclerViewEbook.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerViewEbook.setAdapter(ebookAdapter);
-        fetchDataFromFirebase();
+
 
 
         binding.selectbookBtn.setOnClickListener(view -> openGallery());
@@ -307,7 +307,7 @@ public class EbookActivity extends AppCompatActivity implements OnEbookClickList
         binding.bookFileName.setText("No file Selected");
     }
 
-    public void onDeleteNotice(int position) {
+    public void onDeleteEbook(int position) {
         // Show a confirmation dialog to the user
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirm Deletion");
