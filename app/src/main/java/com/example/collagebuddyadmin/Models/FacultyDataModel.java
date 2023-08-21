@@ -1,6 +1,8 @@
 package com.example.collagebuddyadmin.Models;
 
-public class FacultyDataModel {
+import java.io.Serializable;
+
+public class FacultyDataModel implements Serializable {
     String name;
     String designation;
     String imageUrl;

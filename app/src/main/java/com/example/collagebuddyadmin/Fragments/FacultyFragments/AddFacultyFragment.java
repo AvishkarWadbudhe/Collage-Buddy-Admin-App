@@ -1,4 +1,4 @@
-package com.example.collagebuddyadmin.Fragments;
+package com.example.collagebuddyadmin.Fragments.FacultyFragments;
 
 import static android.app.Activity.RESULT_OK;
 

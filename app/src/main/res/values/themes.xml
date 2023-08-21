@@ -6,4 +6,5 @@
     </style>
 
     <style name="Theme.CollageBuddyAdmin" parent="Base.Theme.CollageBuddyAdmin" />
+
 </resources>

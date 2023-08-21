@@ -33,6 +33,7 @@ public class FacultyAdapter extends RecyclerView.Adapter<FacultyAdapter.ViewHold
         private ImageView imageView;
         private TextView contactTextView;
         private Button deleteBtn;
+        private Button editBtn;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -41,6 +42,7 @@ public class FacultyAdapter extends RecyclerView.Adapter<FacultyAdapter.ViewHold
             imageView = itemView.findViewById(R.id.profileImage);
             contactTextView = itemView.findViewById(R.id.contactNumber);
             deleteBtn = itemView.findViewById(R.id.deleteButton);
+            editBtn = itemView.findViewById(R.id.editButton);
         }
     }
 
@@ -75,6 +77,9 @@ public class FacultyAdapter extends RecyclerView.Adapter<FacultyAdapter.ViewHold
         }
         holder.deleteBtn.setOnClickListener(v ->
                 onFacultyClickListener.onDeleteFacutly(position));
+        holder.editBtn.setOnClickListener(v -> {
+            onFacultyClickListener.onEditFaculty(position);
+        });
     }
 
     @Override

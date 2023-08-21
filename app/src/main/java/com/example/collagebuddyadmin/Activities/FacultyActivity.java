@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,9 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.collagebuddyadmin.Adapters.FacultyAdapter;
-import com.example.collagebuddyadmin.Fragments.AddFacultyFragment;
+import com.example.collagebuddyadmin.Fragments.FacultyFragments.AddFacultyFragment;
+import com.example.collagebuddyadmin.Fragments.FacultyFragments.EditFacultyFragment;
 import com.example.collagebuddyadmin.Listeners.OnFacultyClickListener;
-import com.example.collagebuddyadmin.Models.EbookDataModel;
 import com.example.collagebuddyadmin.Models.FacultyDataModel;
 import com.example.collagebuddyadmin.databinding.ActivityFacultyBinding;
 import com.example.collagebuddyadmin.databinding.FacultyContainerBinding;
@@ -26,8 +25,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class FacultyActivity extends AppCompatActivity implements OnFacultyClick
     FacultyContainerBinding facultyContainerBinding;
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
-    List<FacultyDataModel> facultyList =new ArrayList<>();
+    List<FacultyDataModel> facultyList;
     FacultyAdapter facultyAdapter;
 
     @Override
@@ -47,6 +46,7 @@ public class FacultyActivity extends AppCompatActivity implements OnFacultyClick
         setContentView(binding.getRoot());
         databaseReference =  FirebaseDatabase.getInstance().getReference();
         storageReference = FirebaseStorage.getInstance().getReference();
+        facultyList =new ArrayList<>();
         facultyAdapter = new FacultyAdapter(facultyList,this);
         fetchDataFromFirebase();
 
@@ -114,7 +114,19 @@ public class FacultyActivity extends AppCompatActivity implements OnFacultyClick
 
     @Override
     public void onEditFaculty(int position) {
+        if (position >= 0 && position < facultyList.size()) {
+            FacultyDataModel selectedFaculty = facultyList.get(position);
 
+            // Create a bundle and show the bottom sheet dialog
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedFaculty", selectedFaculty);
+
+            EditFacultyFragment bottomSheetDialog = new EditFacultyFragment();
+            bottomSheetDialog.setArguments(bundle);
+            bottomSheetDialog.show(getSupportFragmentManager(), bottomSheetDialog.getTag());
+        } else {
+            showToast("Invalid position");
+        }
     }
 
     private void deleteFaculty(int position) {

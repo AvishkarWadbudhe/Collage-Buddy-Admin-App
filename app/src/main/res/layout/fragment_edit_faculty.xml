@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-   android:layout_gravity="center"
+    android:layout_gravity="center"
+
     tools:context=".Fragments.FacultyFragments.AddFacultyFragment">
 
     <LinearLayout
@@ -18,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Faculty"
+            android:text="Edit Faculty"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_gravity="center_horizontal"
@@ -105,7 +106,7 @@
                 android:padding="20dp"
                 android:backgroundTint="@color/green"
                 android:textColor="@color/white"
-                android:text="Save "
+                android:text="Update "
                 android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButton
