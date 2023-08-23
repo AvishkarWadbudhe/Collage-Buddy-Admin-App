@@ -6,38 +6,26 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.collagebuddyadmin.Adapters.NoticeAdapter;
+import com.example.collagebuddyadmin.Fragments.NoticeFragments.EditNoticeFragment;
 import com.example.collagebuddyadmin.Listeners.OnNoticeClickListener;
 import com.example.collagebuddyadmin.Models.NoticeDataModel;
 import com.example.collagebuddyadmin.databinding.ActivityNoticeBinding;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -63,157 +51,53 @@ public class NoticeActivity extends AppCompatActivity implements OnNoticeClickLi
         super.onCreate(savedInstanceState);
         binding = ActivityNoticeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        calendar = Calendar.getInstance();
-        progressDialog = new ProgressDialog(this);
         databaseReference = FirebaseDatabase.getInstance().getReference("Notice");
         storageReference = FirebaseStorage.getInstance().getReference();
         noticeList = new ArrayList<>();
         noticeAdapter = new NoticeAdapter(noticeList, this);
-
-        binding.recyclerViewNotices.setLayoutManager(new LinearLayoutManager(this));
-        binding.recyclerViewNotices.setAdapter(noticeAdapter);
         fetchDataFromFirebase();
 
+        binding.noticeRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        binding.noticeRecyclerView.setAdapter(noticeAdapter);
 
-        binding.selectImageBtn.setOnClickListener(view -> openGallery());
-
-        binding.uploadNoticeBtn.setOnClickListener(view -> {
-            if (binding.noticeTitle.getText().toString().trim().isEmpty()) {
-                binding.noticeTitle.setError("Title Empty");
-                binding.noticeTitle.requestFocus();
-            } else if (bitmap == null) {
-                UploadDataWithImage("");
-            } else {
-                UploadImageAndTitle();
-            }
+        binding.fabAddNotice.setOnClickListener(v -> {
+            Intent intent = new Intent(NoticeActivity.this, AddNoticeActivity.class);
+            startActivity(intent);
+    fetchDataFromFirebase();
         });
+binding.imageBackButton.setOnClickListener(v -> {
+    onBackPressed();
+});
+
     }
     private void fetchDataFromFirebase() {
         // Create a query to retrieve data in descending order of timestamps
-        Query query = databaseReference.orderByChild("time");
 
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 noticeList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    NoticeDataModel notice = dataSnapshot.getValue(NoticeDataModel.class);
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    NoticeDataModel noticeDataModel = snapshot.getValue(NoticeDataModel.class);
+                    noticeList.add(noticeDataModel);
 
-                    noticeList.add(notice);
+
                 }
-                // Reverse the list to display the latest items first
                 Collections.reverse(noticeList);
-
-                if (noticeList.isEmpty()) {
-                    binding.noNotice.setVisibility(View.VISIBLE);
-                    binding.prevNotice.setVisibility(View.GONE);
-                } else {
-                    binding.noNotice.setVisibility(View.GONE);
-                    binding.prevNotice.setVisibility(View.VISIBLE);
-                }
-
-                // Notify the adapter of data change
                 noticeAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle the error if needed
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
             }
         });
+
+
+
     }
-
-
-
-    private void UploadDataWithImage(String imageUrl) {
-        progressDialog.setMessage("Uploading");
-        progressDialog.show();
-        DatabaseReference noticeReference = databaseReference;
-        final String uniqueKey = noticeReference.push().getKey();
-
-        SimpleDateFormat currentDate = new SimpleDateFormat("dd-MM-yy");
-        String date = currentDate.format(calendar.getTime());
-        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
-        String time = currentTime.format(calendar.getTime());
-
-        NoticeDataModel noticeDataModel = new NoticeDataModel(
-                binding.noticeTitle.getText().toString(),
-                imageUrl, date, time, uniqueKey
-        );
-
-        noticeReference.child(uniqueKey).setValue(noticeDataModel)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        progressDialog.dismiss();
-                        showToast("Notice Uploaded");
-                        clear();
-                        // Update the RecyclerView with the new notice
-                        noticeList.add(noticeDataModel);
-                        fetchDataFromFirebase();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        progressDialog.dismiss();
-                        showToast("Oops! Something went wrong");
-                    }
-                });
-    }
-
-    private void UploadImageAndTitle() {
-        progressDialog.setMessage("Uploading");
-        progressDialog.show();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-        byte[] finalImg = byteArrayOutputStream.toByteArray();
-        final StorageReference filePath = storageReference.child("Notice").child(System.currentTimeMillis() + ".jpg");
-
-        final UploadTask uploadTask = filePath.putBytes(finalImg);
-        uploadTask.addOnCompleteListener(NoticeActivity.this, new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                if (task.isSuccessful()) {
-                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    downloadUrl = String.valueOf(uri);
-                                    UploadDataWithImage(downloadUrl);
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    progressDialog.dismiss();
-                    showToast("Oops! Something went wrong");
-                }
-            }
-        });
-    }
-
-    private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, ReqCode);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ReqCode && resultCode == RESULT_OK) {
-            Uri uri = data.getData();
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            binding.prevImage.setImageBitmap(bitmap);
-        }
-    }
-
 
     public void onDeleteNotice(int position) {
         // Show a confirmation dialog to the user
@@ -228,6 +112,23 @@ public class NoticeActivity extends AppCompatActivity implements OnNoticeClickLi
         });
         builder.setNegativeButton("Cancel", null);
         builder.show();
+    }
+
+    @Override
+    public void onEditFaculty(int position) {
+        if (position >= 0 && position < noticeList.size()) {
+            NoticeDataModel noticeDataModel = noticeList.get(position);
+
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedNotice", noticeDataModel);
+
+            EditNoticeFragment bottomSheetDialog = new EditNoticeFragment();
+            bottomSheetDialog.setArguments(bundle);
+            bottomSheetDialog.show(getSupportFragmentManager(), bottomSheetDialog.getTag());
+        } else {
+            showToast("Invalid position");
+        }
     }
 
     private void deleteNotice(int position) {
@@ -266,8 +167,4 @@ public class NoticeActivity extends AppCompatActivity implements OnNoticeClickLi
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void clear() {
-        binding.noticeTitle.setText(null);
-        binding.prevImage.setImageBitmap(null);
-    }
 }

@@ -136,7 +136,7 @@ public class FacultyActivity extends AppCompatActivity implements OnFacultyClick
 
 
         // Delete image from Firebase Storage if the image URL is not empty
-        if (!imageUrl.isEmpty()) {
+        if (!imageUrl.equalsIgnoreCase("none")) {
             StorageReference imageStorageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl);
             imageStorageReference.delete()
                     .addOnSuccessListener(aVoid -> {

@@ -8,11 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,26 +15,31 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.collagebuddyadmin.Models.FacultyDataModel;
+import com.example.collagebuddyadmin.Models.NoticeDataModel;
 import com.example.collagebuddyadmin.R;
-import com.example.collagebuddyadmin.databinding.FragmentAddFacultyBinding;
 import com.example.collagebuddyadmin.databinding.FragmentEditFacultyBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class EditFacultyFragment extends BottomSheetDialogFragment {
 
@@ -61,10 +61,11 @@ public class EditFacultyFragment extends BottomSheetDialogFragment {
     private Bitmap bitmap;
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
-    private String downloadUrl = "";
+    private String imageUrl = "";
 
     private ProgressDialog progressDialog;
     private Calendar calendar;
+   private  FacultyDataModel selectedFaculty;
 
 
 
@@ -89,7 +90,7 @@ public class EditFacultyFragment extends BottomSheetDialogFragment {
         binding.spinnerDesignation.setAdapter(adapter);
 
         Bundle bundle = getArguments();
-        FacultyDataModel selectedFaculty = (FacultyDataModel) bundle.getSerializable("selectedFaculty");
+     selectedFaculty = (FacultyDataModel) bundle.getSerializable("selectedFaculty");
         if (bundle != null) {
             // Use the selectedFaculty data to pre-fill edit fields
             if (selectedFaculty != null) {
@@ -97,7 +98,7 @@ public class EditFacultyFragment extends BottomSheetDialogFragment {
                 binding.spinnerDesignation.setSelection(getDesignationPosition(selectedFaculty.getDesignation()));
                 binding.contact.setText(selectedFaculty.getContact());
 
-                if(selectedFaculty.getImageUrl().equalsIgnoreCase("")){
+                if(selectedFaculty.getImageUrl().equalsIgnoreCase("none")){
                     binding.textAddImage.setVisibility(View.VISIBLE);
                 }
                 Glide.with(this)
@@ -130,94 +131,89 @@ public class EditFacultyFragment extends BottomSheetDialogFragment {
         // Initialize your views and set click listeners here
         binding.btnSave.setOnClickListener(v -> {
             if (validateFields()){
+                    if(selectedFaculty.getImageUrl().equalsIgnoreCase("none")){
+                        updateFacultyData(selectedFaculty.getUniqueKey());
+                    }
+                    else{
+                        UploadFacultyImage(selectedFaculty.getUniqueKey(),selectedFaculty.getImageUrl());
+                    }
 
-                updateFacultyData(selectedFaculty.getUniqueKey(),selectedFaculty.getImageUrl()
-                        ,bitmap);
             }
         });
 
       return  view;
     }
-    private void updateFacultyData(String facultyId, String imageUrl, Bitmap newImageBitmap) {
+
+    private void updateFacultyData(String facultyId) {
         progressDialog.setMessage("Updating");
         progressDialog.show();
 
         DatabaseReference facultyRef = databaseReference.child(facultyId);
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        newImageBitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-        byte[] finalImg = byteArrayOutputStream.toByteArray();
+        // Proceed to update faculty data
+        FacultyDataModel updatedFacultyData = new FacultyDataModel(
+                binding.name.getText().toString(),
+                binding.spinnerDesignation.getSelectedItem().toString(),
+                imageUrl,
+                binding.contact.getText().toString(),
+                facultyId
+        );
 
-        final StorageReference filePath = storageReference.child("FacultyPictures").child(System.currentTimeMillis() + ".jpg");
-        final UploadTask uploadTask = filePath.putBytes(finalImg);
-
-        uploadTask.addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                uploadTask.addOnSuccessListener(taskSnapshot -> {
-                    filePath.getDownloadUrl().addOnSuccessListener(uri -> {
-                        String updatedImageUrl = String.valueOf(uri);
-
-                        // Get the current faculty data to access the old imageUrl
-                        facultyRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists()) {
-                                    FacultyDataModel currentFaculty = snapshot.getValue(FacultyDataModel.class);
-
-                                    // Delete the old image from storage
-                                    if (currentFaculty != null && !currentFaculty.getImageUrl().isEmpty()) {
-                                        StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(currentFaculty.getImageUrl());
-                                        oldImageRef.delete()
-                                                .addOnSuccessListener(aVoid -> {
-                                                    // Proceed to update faculty data
-                                                    FacultyDataModel updatedFacultyData = new FacultyDataModel(
-                                                            binding.name.getText().toString(),
-                                                            binding.spinnerDesignation.getSelectedItem().toString(),
-                                                            updatedImageUrl,
-                                                            binding.contact.getText().toString(),
-                                                            facultyId
-                                                    );
-
-                                                    facultyRef.setValue(updatedFacultyData)
-                                                            .addOnSuccessListener(unused -> {
-                                                                progressDialog.dismiss();
-                                                                showToast("Faculty Detail Updated");
-                                                                dismiss();
-                                                            })
-                                                            .addOnFailureListener(e -> {
-                                                                progressDialog.dismiss();
-                                                                showToast("Oops! Something went wrong");
-                                                            });
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    progressDialog.dismiss();
-                                                    showToast("Failed to delete old image");
-                                                });
-                                    } else {
-                                        progressDialog.dismiss();
-                                        showToast("Failed to retrieve old image URL");
-                                    }
-                                } else {
-                                    progressDialog.dismiss();
-                                    showToast("Faculty data not found");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                progressDialog.dismiss();
-                                showToast("Failed to retrieve faculty data");
-                            }
-                        });
-                    });
+        facultyRef.setValue(updatedFacultyData)
+                .addOnSuccessListener(unused -> {
+                    progressDialog.dismiss();
+                    showToast("Faculty Detail Updated");
+                    dismiss();
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    showToast("Oops! Something went wrong");
                 });
-            } else {
-                progressDialog.dismiss();
-                showToast("Oops! Something went wrong");
+    }
+    private void deleteNotice(String oldImgUrl) {
+        // Delete image from Firebase Storage
+
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(oldImgUrl);
+            storageReference.delete()
+                    .addOnSuccessListener(aVoid -> {
+                    })
+                    .addOnFailureListener(exception -> {
+                        showToast("Image deletion failed: " + exception.getMessage());
+                    });
+    }
+    private void UploadFacultyImage(String facultyId,String oldImgUrl) {
+        progressDialog.setMessage("Uploading");
+        progressDialog.show();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        byte[] finalImg = byteArrayOutputStream.toByteArray();
+        final StorageReference filePath = storageReference.child("FacultyPictures").child(System.currentTimeMillis() + ".jpg");
+
+        final UploadTask uploadTask = filePath.putBytes(finalImg);
+        uploadTask.addOnCompleteListener(requireActivity(), new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    imageUrl = String.valueOf(uri);
+                                    deleteNotice(oldImgUrl);
+                                    updateFacultyData(facultyId);
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    progressDialog.dismiss();
+                    showToast("Oops! Something went wrong");
+                }
             }
         });
     }
-
 
 
 

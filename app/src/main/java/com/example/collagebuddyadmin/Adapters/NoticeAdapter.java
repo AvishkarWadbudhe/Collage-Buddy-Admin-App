@@ -3,6 +3,7 @@ package com.example.collagebuddyadmin.Adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,15 +33,21 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         private final TextView noticeTitle;
         private final TextView noticeDate;
         private final TextView noticeTime;
+        private final TextView notice;
+        private final Button deleteBtn;
+        private final Button editBtn;
 
 
 
         public NoticeViewHolder(View itemView) {
             super(itemView);
-            noticeImage = itemView.findViewById(R.id.noticePreviewImage);
-            noticeTitle = itemView.findViewById(R.id.noticeTitleTextView);
-            noticeDate = itemView.findViewById(R.id.noticeDateTextView);
-            noticeTime = itemView.findViewById(R.id.noticeTimeTextView);
+            noticeImage = itemView.findViewById(R.id.noticeImage);
+            notice = itemView.findViewById(R.id.noticeDescription);
+            noticeTitle = itemView.findViewById(R.id.noticeTitle);
+            noticeDate = itemView.findViewById(R.id.noticeDate);
+            noticeTime = itemView.findViewById(R.id.noticeTime);
+            deleteBtn = itemView.findViewById(R.id.deleteButton);
+            editBtn = itemView.findViewById(R.id.editButton);
         }
     }
 
@@ -57,22 +64,20 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         holder.noticeTitle.setText(notice.getTitle());
         holder.noticeDate.setText(notice.getDate());
         holder.noticeTime.setText(notice.getTime());
+        holder.notice.setText(notice.getNotice());
 
-        if (notice.getImage() != null) {
+        if (!notice.getImage().equalsIgnoreCase("")) {
             Glide.with(holder.itemView.getContext())
                     .load(notice.getImage())
                     .placeholder(R.drawable.placeholder_image)
                     .into(holder.noticeImage);
+            holder.noticeImage.setVisibility(View.VISIBLE); // Set visibility to VISIBLE if there's an image
         } else {
-            Glide.with(holder.itemView.getContext())
-                    .load(R.drawable.placeholder_image)
-                    .placeholder(R.drawable.placeholder_image)
-                    .into(holder.noticeImage);
+            holder.noticeImage.setVisibility(View.GONE); // Set visibility to GONE if there's no image
         }
 
-        holder.itemView.setOnLongClickListener(v -> {
+        holder.deleteBtn.setOnClickListener(v -> {
             onNoticeClickListener.onDeleteNotice(position);
-            return true;
         });
     }
 

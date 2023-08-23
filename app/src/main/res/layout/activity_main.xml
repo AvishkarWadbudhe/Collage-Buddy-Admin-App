@@ -67,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:gravity="center"
-                    android:text="Add Notice"
+                    android:text="Notice"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -112,7 +112,7 @@
                     android:gravity="center"
                     android:layout_marginTop="5dp"
                     android:textStyle="bold"
-                    android:text="Update Notes" />
+                    android:text="Ebooks" />
 
             </LinearLayout>
 

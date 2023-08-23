@@ -3,6 +3,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -59,9 +60,11 @@ public class EbookAdapter extends RecyclerView.Adapter<EbookAdapter.EbookViewHol
         }
 
         // Set an onClickListener to handle clicks on the items
-        holder.itemView.setOnLongClickListener(v -> {
+        holder.deleteBtn.setOnClickListener(v -> {
            onEbookClickListener.onDeleteEbook(position);
-            return true;
+        });
+        holder.editBtn.setOnClickListener(v -> {
+            onEbookClickListener.onDeleteEbook(position);
         });
     }
 
@@ -71,16 +74,20 @@ public class EbookAdapter extends RecyclerView.Adapter<EbookAdapter.EbookViewHol
     }
 
     static class EbookViewHolder extends RecyclerView.ViewHolder {
-        ImageView thumbnailImageView;
-        TextView ebookTitleTextView;
-        TextView dateTextView;
-        TextView TimeTextView;
+      private   ImageView thumbnailImageView;
+        private   TextView ebookTitleTextView;
+        private  TextView dateTextView;
+        private TextView TimeTextView;
+        private   Button deleteBtn;
+        private Button editBtn;
         EbookViewHolder(@NonNull View itemView) {
             super(itemView);
-            thumbnailImageView = itemView.findViewById(R.id.ebookThumbnail);
-            ebookTitleTextView = itemView.findViewById(R.id.ebookTitleTextView);
-            dateTextView = itemView.findViewById(R.id.DateTextView);
-            TimeTextView = itemView.findViewById(R.id.TimeTextView);
+            thumbnailImageView = itemView.findViewById(R.id.eBookThumbnail);
+            ebookTitleTextView = itemView.findViewById(R.id.eBookTitle);
+            dateTextView = itemView.findViewById(R.id.date);
+            TimeTextView = itemView.findViewById(R.id.time);
+            editBtn = itemView.findViewById(R.id.edit_button);
+            deleteBtn = itemView.findViewById(R.id.delete_button);
 
         }
     }

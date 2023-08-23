@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Upload E-Book -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Upload E-Book"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Image View with Add PDF Text -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/selectPdfCardview"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal">
+
+
+            <ImageView
+                android:id="@+id/pdfThumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:contentDescription="E-Book Thumbnail" />
+
+
+        <TextView
+            android:id="@+id/textSelectPdf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Select PDF"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:textColor="@color/colorTextHint"
+            android:padding="8dp"/>
+
+    </FrameLayout>
+</androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/pdfName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="pdf name"
+        android:textStyle="bold"
+        android:layout_marginTop="5dp"
+        android:textSize="12sp"
+        android:layout_gravity="center"
+        />
+
+    <!-- Edit Text for PDF Title -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/eBookTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:windowSoftInputMode="stateAlwaysVisible"
+            android:hint="Title" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <!-- Save and Cancel Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        >
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:backgroundTint="@color/green"
+            android:textColor="@color/white"
+            android:text="Save "
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:text="Cancel"
+            android:layout_marginLeft="20dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</LinearLayout>

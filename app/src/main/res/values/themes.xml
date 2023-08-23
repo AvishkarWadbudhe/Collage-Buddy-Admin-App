@@ -7,4 +7,10 @@
 
     <style name="Theme.CollageBuddyAdmin" parent="Base.Theme.CollageBuddyAdmin" />
 
+    <style name="FullScreenBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+
 </resources>

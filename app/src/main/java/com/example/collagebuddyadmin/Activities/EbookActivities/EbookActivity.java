@@ -21,6 +21,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.collagebuddyadmin.Adapters.EbookAdapter;
+import com.example.collagebuddyadmin.Fragments.EbookFragments.AddEbookFragment;
+import com.example.collagebuddyadmin.Fragments.FacultyFragments.AddFacultyFragment;
 import com.example.collagebuddyadmin.Listeners.OnEbookClickListener;
 import com.example.collagebuddyadmin.Models.EbookDataModel;
 import com.example.collagebuddyadmin.databinding.ActivityEbookBinding;
@@ -76,24 +78,17 @@ public class EbookActivity extends AppCompatActivity implements OnEbookClickList
         fetchDataFromFirebase();
         ebookAdapter = new EbookAdapter( eBookList, this,this);
 
+        binding.addEbookBtn.setOnClickListener(v -> {
+            showAddFacultyDialog();
+        });
+
         binding.recyclerViewEbook.setLayoutManager(new LinearLayoutManager(this));
         binding.recyclerViewEbook.setAdapter(ebookAdapter);
 
-
-
-        binding.selectbookBtn.setOnClickListener(view -> openGallery());
-
-        binding.uploadEbookBtn.setOnClickListener(v -> {
-            if (binding.bookTitle.getText().toString().isEmpty()) {
-                binding.bookTitle.setError("Empty");
-                binding.bookTitle.requestFocus();
-            } else if (pdfData == null) {
-                showToast("Please Upload PDF");
-            } else {
-                Upload_Ebook_Thumbnail();
-            }
-
-        });
+    }
+    private void showAddFacultyDialog() {
+        AddEbookFragment bottomSheetDialog = new AddEbookFragment();
+        bottomSheetDialog.show(getSupportFragmentManager(), bottomSheetDialog.getTag());
     }
 
     private void fetchDataFromFirebase() {
@@ -108,13 +103,6 @@ public class EbookActivity extends AppCompatActivity implements OnEbookClickList
                     eBookList.add(ebookDataModel);
                 }
                 Collections.reverse(eBookList);
-                if (eBookList.isEmpty()) {
-                    binding.noEbook.setVisibility(View.VISIBLE);
-                    binding.prevEbook.setVisibility(View.GONE);
-                } else {
-                    binding.noEbook.setVisibility(View.GONE);
-                    binding.prevEbook.setVisibility(View.VISIBLE);
-                }
 
                 // Notify the adapter of data change
                 ebookAdapter.notifyDataSetChanged();
@@ -128,183 +116,9 @@ public class EbookActivity extends AppCompatActivity implements OnEbookClickList
         });
     }
 
-    private void Upload_Ebook_Thumbnail() {
-        progressDialog.setTitle("Please wait...");
-        progressDialog.setMessage("Uploading E-Book...");
-        progressDialog.show();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        thumbnail.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
-        byte[] finalImg = byteArrayOutputStream.toByteArray();
-        final StorageReference filePath = storageReference.child("Ebook_Thumbnails").child(System.currentTimeMillis() + ".jpg");
-
-        final UploadTask uploadTask = filePath.putBytes(finalImg);
-        uploadTask.addOnCompleteListener(EbookActivity.this, new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                if (task.isSuccessful()) {
-                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    thumbnailUrl = String.valueOf(uri);
-                                    uploadPdf();
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    progressDialog.dismiss();
-                    showToast("Oops! Something went wrong");
-                }
-            }
-        });
-    }
-
-
-    private void uploadPdf() {
-
-        StorageReference reference = storageReference.child("Ebooks/" + binding.bookTitle.getText().toString() + ".pdf");
-
-        reference.putFile(pdfData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // Get the download URL of the uploaded file
-                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-
-                uriTask.addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> uriTask) {
-                        if (uriTask.isSuccessful()) {
-                            Uri uri = uriTask.getResult();
-                            // Upload the data with the obtained download URL
-                            uploadData(uri.toString());
-                        } else {
-                            showToast("Failed to retrieve download URL");
-                        }
-                    }
-                });
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                showToast("Oops! Something went wrong");
-                progressDialog.dismiss();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                showToast("Oops! Something went wrong");
-                progressDialog.dismiss();
-            }
-        });
-    }
-
-    private void uploadData(String pdfUrl) {
-        DatabaseReference eBookReference = databaseReference;
-        final String uniqueKey = eBookReference.push().getKey();
-        SimpleDateFormat currentDate = new SimpleDateFormat("dd-MM-yy");
-        String date = currentDate.format(calendar.getTime());
-        SimpleDateFormat currentTime = new SimpleDateFormat("hh:mm a");
-        String time = currentTime.format(calendar.getTime());
-
-
-        EbookDataModel ebookDataModel = new EbookDataModel(
-                binding.bookTitle.getText().toString(), thumbnailUrl, date, pdfUrl, time, uniqueKey
-        );
-        eBookReference.child(uniqueKey).setValue(ebookDataModel).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                progressDialog.dismiss();
-
-                showToast("E-Book Uploaded successfully");
-                clear();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                progressDialog.dismiss();
-
-                showToast("Failed to upload E-Book");
-            }
-        });
-
-    }
-
-    private void openGallery() {
-        Intent intent = new Intent();
-        String[] mimeTypes = {"application/pdf", "application/msword", "application/vnd.ms-powerpoint"};
-        intent.setType("*/*");  // This will allow any file type
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);  // Set allowed MIME types
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Document"), ReqCode);
-    }
-
-    @SuppressLint("Range")
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ReqCode && resultCode == RESULT_OK) {
-            pdfData = data.getData();
-            thumbnail = generatePdfThumbnail(pdfData);
-            if (thumbnail != null) {
-                binding.prevImage.setImageBitmap(thumbnail);
-            } else {
-                showToast("Failed to generate PDF thumbnail");
-            }
-            if (pdfData.toString().startsWith("content://")) {
-                Cursor cursor = null;
-                try {
-                    cursor = EbookActivity.this.getContentResolver().query(pdfData, null, null, null, null);
-                    if (cursor != null && cursor.moveToFirst()) {
-                        eBookName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-
-            } else if (pdfData.toString().startsWith("file://")) {
-                eBookName = new File(pdfData.toString()).getName();
-            }
-            binding.bookFileName.setText(eBookName.toString());
-        }
-    }
-
-    private Bitmap generatePdfThumbnail(Uri pdfUri) {
-        try {
-            ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(pdfUri, "r");
-            if (parcelFileDescriptor != null) {
-                PdfRenderer pdfRenderer = new PdfRenderer(parcelFileDescriptor);
-                PdfRenderer.Page page = pdfRenderer.openPage(0);
-
-                Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
-
-                page.close();
-                pdfRenderer.close();
-                parcelFileDescriptor.close();
-
-                if (bitmap.equals("")) {
-                    showToast("hehehhhe");
-                }
-
-                return bitmap;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    private void clear() {
-        binding.bookTitle.setText(null);
-        binding.prevImage.setImageBitmap(null);
-        binding.bookFileName.setText("No file Selected");
     }
 
     public void onDeleteEbook(int position) {

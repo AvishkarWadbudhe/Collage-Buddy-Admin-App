@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    tools:context=".Activities.NoticeActivities.AddNoticeActivity"
+    android:id="@+id/createNoteLayout">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/saveNotice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_save"
+        android:backgroundTint="@color/colorAccent"
+        app:tint="@color/white"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        android:clipToPadding="false"
+        android:paddingBottom="10sp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:animateLayoutChanges="true">
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="12dp"
+                android:gravity="center_vertical"
+
+                tools:ignore="MissingConstraints">
+
+                <ImageView
+                    android:id="@+id/imageBackButton"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_back"
+                    app:tint="@color/colorAccent"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:text="Upload Notice"
+
+                    android:textSize="20sp"/>
+
+            </LinearLayout>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                android:layout_marginTop="10dp"
+                app:cardElevation="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linearLayout"
+                android:layout_centerInParent="true">
+
+                <FrameLayout
+                    android:id="@+id/imageFrameLayout"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_gravity="center">
+
+                    <ImageView
+                        android:id="@+id/noticeImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/app_name"/>
+
+                    <TextView
+                        android:id="@+id/textAddImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Add Image"
+                        android:textColor="@color/colorTextHint"
+                        android:textSize="16sp"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <EditText
+                android:id="@+id/inputNoticeTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="1dp"
+                android:layout_marginBottom="10dp"
+                android:hint="Title"
+                android:imeOptions="actionNext"
+                android:importantForAutofill="no"
+                android:includeFontPadding="false"
+                android:inputType="text"
+                android:textColor="@color/black"
+                android:textColorHint="@color/colorTextHint"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@id/textDateTime"
+                app:layout_constraintTop_toBottomOf="@id/cardView" />
+
+            <TextView
+                android:id="@+id/textDateTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:hint="date"
+                android:includeFontPadding="false"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/inputNoticeDescription"
+                app:layout_constraintStart_toStartOf="@id/inputNoticeTitle"
+                app:layout_constraintTop_toBottomOf="@id/inputNoticeTitle" />
+
+
+
+
+
+            <EditText
+                android:id="@+id/inputNoticeDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="15dp"
+                android:background="@null"
+                android:gravity="top"
+                android:hint="Notice"
+                android:importantForAutofill="no"
+                android:includeFontPadding="false"
+                android:inputType="textMultiLine"
+                android:minHeight="100dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/colorTextHint"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/inputNoticeTitle" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

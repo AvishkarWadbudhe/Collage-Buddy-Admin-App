@@ -17,9 +17,15 @@
         android:theme="@style/Theme.CollageBuddyAdmin"
         tools:targetApi="31">
         <activity
-            android:name=".Activities.FacultyActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:name=".Activities.EbookActivities.AddEbookActivity"
             android:exported="false" />
+        <activity
+            android:name=".Activities.NoticeActivities.AddNoticeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.FacultyActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".Activities.EbookActivities.EbookActivity"
             android:exported="false" />

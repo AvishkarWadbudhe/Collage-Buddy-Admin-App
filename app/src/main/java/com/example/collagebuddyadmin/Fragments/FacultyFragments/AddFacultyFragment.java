@@ -62,6 +62,13 @@ public class AddFacultyFragment extends BottomSheetDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentAddFacultyBinding.inflate(inflater, container, false);
+        // Set the dialog's window layout parameters to fullscreen
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            );
+        }
         View view = binding.getRoot();
         calendar = Calendar.getInstance();
         progressDialog = new ProgressDialog(getContext());
@@ -89,7 +96,7 @@ public class AddFacultyFragment extends BottomSheetDialogFragment {
             if (validateFields()){
                     if(bitmap==null)
                     {
-                        UploadData("");
+                        UploadData("none");
                     }
                     else{
                         UploadDataWithImage();
