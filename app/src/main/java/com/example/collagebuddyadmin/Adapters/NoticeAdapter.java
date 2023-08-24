@@ -34,6 +34,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         private final TextView noticeDate;
         private final TextView noticeTime;
         private final TextView notice;
+        private final TextView edited;
         private final Button deleteBtn;
         private final Button editBtn;
 
@@ -48,6 +49,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
             noticeTime = itemView.findViewById(R.id.noticeTime);
             deleteBtn = itemView.findViewById(R.id.deleteButton);
             editBtn = itemView.findViewById(R.id.editButton);
+            edited = itemView.findViewById(R.id.edited);
         }
     }
 
@@ -66,7 +68,15 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         holder.noticeTime.setText(notice.getTime());
         holder.notice.setText(notice.getNotice());
 
-        if (!notice.getImage().equalsIgnoreCase("")) {
+        if(notice.getEdited().equalsIgnoreCase("yes"))
+        {
+            holder.edited.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.edited.setVisibility(View.GONE);
+        }
+
+        if (!notice.getImage().equalsIgnoreCase("none")) {
             Glide.with(holder.itemView.getContext())
                     .load(notice.getImage())
                     .placeholder(R.drawable.placeholder_image)
@@ -78,6 +88,9 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
 
         holder.deleteBtn.setOnClickListener(v -> {
             onNoticeClickListener.onDeleteNotice(position);
+        });
+        holder.editBtn.setOnClickListener(v -> {
+            onNoticeClickListener.onEditFaculty(position);
         });
     }
 

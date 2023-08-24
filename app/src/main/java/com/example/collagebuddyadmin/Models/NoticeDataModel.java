@@ -13,22 +13,33 @@ public class NoticeDataModel implements Serializable {
         this.notice = notice;
     }
 
-    String notice;
-    String image;
-    String date;
-    String time;
-    String key;
+  private   String notice;
+    private String image;
+    private String date;
+    private String time;
+    private String key;
+
+    public String getEdited() {
+        return edited;
+    }
+
+    public void setEdited(String edited) {
+        this.edited = edited;
+    }
+
+    private  String edited;
 
     public NoticeDataModel() {
     }
 
-    public NoticeDataModel(String title,String notice, String image, String date, String time, String key) {
+    public NoticeDataModel(String title,String notice, String image, String date, String time, String key,String edited) {
         this.title = title;
         this.notice = notice;
         this.image = image;
         this.date = date;
         this.time = time;
         this.key = key;
+        this.edited = edited;
     }
 
     public String getTitle() {

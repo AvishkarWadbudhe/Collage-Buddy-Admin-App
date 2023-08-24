@@ -35,6 +35,16 @@
                 android:textSize="10sp"
                 android:layout_marginLeft="8dp"
                 android:text="Notice Time" />
+
+            <TextView
+                android:id="@+id/edited"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:visibility="gone"
+                android:layout_marginLeft="8dp"
+                android:text="Edited" />
         </LinearLayout>
 
 

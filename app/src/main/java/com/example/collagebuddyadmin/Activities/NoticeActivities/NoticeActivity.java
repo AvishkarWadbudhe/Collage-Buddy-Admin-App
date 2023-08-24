@@ -119,17 +119,18 @@ binding.imageBackButton.setOnClickListener(v -> {
         if (position >= 0 && position < noticeList.size()) {
             NoticeDataModel noticeDataModel = noticeList.get(position);
 
-
             Bundle bundle = new Bundle();
             bundle.putSerializable("selectedNotice", noticeDataModel);
 
-            EditNoticeFragment bottomSheetDialog = new EditNoticeFragment();
-            bottomSheetDialog.setArguments(bundle);
-            bottomSheetDialog.show(getSupportFragmentManager(), bottomSheetDialog.getTag());
+            Intent intent = new Intent(NoticeActivity.this, EditNoticeActivity.class);
+            intent.putExtras(bundle); // Use putExtras() to add the bundle to the intent
+            startActivity(intent); // Start the EditNoticeActivity
         } else {
             showToast("Invalid position");
         }
+        fetchDataFromFirebase();
     }
+
 
     private void deleteNotice(int position) {
         NoticeDataModel notice = noticeList.get(position);

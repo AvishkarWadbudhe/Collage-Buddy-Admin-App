@@ -61,7 +61,7 @@ public class EditFacultyFragment extends BottomSheetDialogFragment {
     private Bitmap bitmap;
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
-    private String imageUrl = "";
+   // private String imageUrl = "none";
 
     private ProgressDialog progressDialog;
     private Calendar calendar;
@@ -131,20 +131,14 @@ public class EditFacultyFragment extends BottomSheetDialogFragment {
         // Initialize your views and set click listeners here
         binding.btnSave.setOnClickListener(v -> {
             if (validateFields()){
-                    if(selectedFaculty.getImageUrl().equalsIgnoreCase("none")){
-                        updateFacultyData(selectedFaculty.getUniqueKey());
-                    }
-                    else{
-                        UploadFacultyImage(selectedFaculty.getUniqueKey(),selectedFaculty.getImageUrl());
-                    }
-
+                UploadFacultyImage(selectedFaculty.getUniqueKey(),selectedFaculty.getImageUrl());
             }
         });
 
       return  view;
     }
 
-    private void updateFacultyData(String facultyId) {
+    private void updateFacultyData(String facultyId,String imageUrl) {
         progressDialog.setMessage("Updating");
         progressDialog.show();
 
@@ -181,39 +175,56 @@ public class EditFacultyFragment extends BottomSheetDialogFragment {
                         showToast("Image deletion failed: " + exception.getMessage());
                     });
     }
-    private void UploadFacultyImage(String facultyId,String oldImgUrl) {
+    private void UploadFacultyImage(String facultyId, String oldImgUrl) {
         progressDialog.setMessage("Uploading");
         progressDialog.show();
+
+        // Check if bitmap is null before attempting to upload
+        if (bitmap == null) {
+            showToast("No image selected. Using default image URL.");
+            updateFacultyData(facultyId, oldImgUrl);
+            progressDialog.dismiss();
+            return;
+        }
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
         byte[] finalImg = byteArrayOutputStream.toByteArray();
-        final StorageReference filePath = storageReference.child("FacultyPictures").child(System.currentTimeMillis() + ".jpg");
+         StorageReference filePath = storageReference.child("FacultyPictures").child(System.currentTimeMillis() + ".jpg");
 
-        final UploadTask uploadTask = filePath.putBytes(finalImg);
-        uploadTask.addOnCompleteListener(requireActivity(), new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                if (task.isSuccessful()) {
-                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    imageUrl = String.valueOf(uri);
-                                    deleteNotice(oldImgUrl);
-                                    updateFacultyData(facultyId);
-                                }
-                            });
-                        }
-                    });
-                } else {
-                    progressDialog.dismiss();
-                    showToast("Oops! Something went wrong");
+         UploadTask uploadTask = filePath.putBytes(finalImg);
+
+        try {
+            uploadTask.addOnCompleteListener(getActivity(), new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        String imageUrl = String.valueOf(uri);
+                                        if(!oldImgUrl.equalsIgnoreCase("none"))
+                                        {deleteNotice(oldImgUrl);}
+
+                                        updateFacultyData(facultyId, imageUrl);
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        progressDialog.dismiss();
+                        showToast("Oops! Something went wrong");
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+           showToast(e.toString());
+        }
     }
+
 
 
 

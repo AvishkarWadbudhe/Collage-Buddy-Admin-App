@@ -64,7 +64,7 @@ public class FacultyAdapter extends RecyclerView.Adapter<FacultyAdapter.ViewHold
         holder.contactTextView.setText(faculty.getContact());
 
 
-        if (!faculty.getImageUrl().equalsIgnoreCase("")) {
+        if (!faculty.getImageUrl().equalsIgnoreCase("none")) {
             Glide.with(holder.itemView.getContext())
                     .load(faculty.getImageUrl())
                     .placeholder(R.drawable.placeholder_image)
