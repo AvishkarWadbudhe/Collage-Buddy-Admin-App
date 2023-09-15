@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-    namespace 'com.example.collagebuddyadmin'
+    namespace 'com.example.collegebuddyadmin'
     compileSdk 34
     viewBinding{
         enabled = true
     }
 
     defaultConfig {
-        applicationId "com.example.collagebuddyadmin"
+        applicationId "com.example.collegebuddyadmin"
         minSdk 24
         targetSdk 34
         versionCode 1
@@ -29,6 +29,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures{
+        viewBinding true
     }
 }
 

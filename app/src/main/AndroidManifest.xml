@@ -14,29 +14,29 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CollageBuddyAdmin"
+        android:theme="@style/Theme.CollegeBuddyAdmin"
         tools:targetApi="31">
         <activity
-            android:name=".Activities.NoticeActivities.EditNoticeActivity"
+            android:name="com.example.collegebuddyadmin.Activities.SyllabusActivities.SyllabusActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.EbookActivities.AddEbookActivity"
+            android:name="com.example.collegebuddyadmin.Activities.NoticeActivities.EditNoticeActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.NoticeActivities.AddNoticeActivity"
+            android:name="com.example.collegebuddyadmin.Activities.NoticeActivities.AddNoticeActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.FacultyActivity"
+            android:name="com.example.collegebuddyadmin.Activities.FacultyActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Activities.EbookActivities.EbookActivity"
+            android:name="com.example.collegebuddyadmin.Activities.EbookActivities.EbookActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.NoticeActivities.NoticeActivity"
+            android:name="com.example.collegebuddyadmin.Activities.NoticeActivities.NoticeActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.MainActivity"
+            android:name="com.example.collegebuddyadmin.Activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
